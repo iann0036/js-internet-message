@@ -142,6 +142,26 @@ describe("InternetMessage", function() {
       msg.must.eql(new InternetMessage({"Content-Type": "text/plain"}))
     })
 
+    it("must parse folded header", function() {
+      var msg = InternetMessage.parse("Field: value1\r\n value2\r\n")
+      msg.must.eql(new InternetMessage({"Field": "value1 value2"}))
+    })
+
+    it("must parse folded header with values on the second line", function() {
+      var msg = InternetMessage.parse("Field: \r\n value1\r\n")
+      msg.must.eql(new InternetMessage({"Field": "value1"}))
+    })
+
+    it("must parse folded header", function() {
+      var msg = InternetMessage.parse("Field: value1\r\n value2\r\n value3\r\n")
+      msg.must.eql(new InternetMessage({"Field": "value1 value2 value3"}))
+    })
+
+    it("must parse folded header with leading whitespaces", function() {
+      var msg = InternetMessage.parse("Field: value1\r\n  value2\r\n        value3\r\n value4\r\n")
+      msg.must.eql(new InternetMessage({"Field": "value1 value2 value3 value4"}))
+    })
+
     it("must parse header with multiple colons", function() {
       var msg = InternetMessage.parse("Ratio: 1:2\r\n")
       msg.must.eql(new InternetMessage({"Ratio": "1:2"}))

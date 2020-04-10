@@ -130,8 +130,14 @@ InternetMessage.parse = function(msg, opts) {
     if (eolIndex == -1) throw new SyntaxError("Invalid Message: No EOL")
 
     var line = msg.slice(i, eolIndex)
-    if (eol == LF && line[line.length - 1] == CR) line = line.slice(0, -1)
-    headers.push(line)
+    if (eol == LF && line[line.length - 1] == CR) line = line.slice(0, -1) 
+    // Handles folded (multiple lines) headers (RFC822 section 3.1.1)
+    if (line.indexOf(":") < 0) {
+      var last = headers[headers.length - 1]
+      if (last) last = last.trim(); // trim last values if there is any
+      headers[headers.length - 1] = last + " " + line.trim()
+    } else headers.push(line)
+
   }
 
   return new InternetMessage(
